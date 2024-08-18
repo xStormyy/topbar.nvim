@@ -23,19 +23,30 @@ M.config = {
             ex = "EX",
             shell = "SHELL",
             prompt = "PROMPT",
-        }
+        },
+
+        padding = 1  -- Adds padding left and right of the mode
     },
 
     time = {
         format = "%H:%M"
+    },
+
+    file_name = {
+        labels = {
+            modified = "+",
+            read_only = "-",
+            unnamed = "No Name",
+            new = "New",
+        },
     }
+
 }
 
 M.setup = function(args)
-    M.config = vim.tbl_deep_extend("force", M.config, args or {})
+    M.config = vim.tbl_deep_extend("keep", M.config, args or {})
 end
 
--- TODO add colored background
 function M.component_mode()
     local mode_to_str = {
         ['n'] = M.config.mode.labels.normal,
@@ -91,7 +102,13 @@ function M.component_mode()
         highlight = "%#StatusNormal#"
     end
 
-    return string.format("%s %s %s", highlight, mode, "%#StatusLine#")
+    return table.concat {
+        string.format("%s", highlight),
+        string.format("%s", string.rep(" ", M.config.mode.padding)),
+        string.format("%s", mode),
+        string.format("%s", string.rep(" ", M.config.mode.padding)),
+        string.format("%s", "%#StatusLine#"),
+    }
 end
 
 function M.component_position()
@@ -101,15 +118,30 @@ function M.component_position()
     return string.format("%d:%d", line, column)
 end
 
+-- TODO: make it only show filenamw instead of path
 function M.component_filename()
-    return "%f"
+    if vim.bo.modified then
+        return "%f " .. string.format("[%s]", M.config.file_name.labels.modified)
+    elseif vim.bo.modifiable == false or vim.bo.readonly then
+        return "%f " .. string.format("[%s]", M.config.file_name.labels.read_only)
+    else
+        return "%f"
+    end
 end
 
 -- TODO: proper implementation
 function M.component_git()
-    local head = os.execute("git branch")
-
-    return string.format("%s", head)
+    local HEAD_file = io.open(".git/HEAD")
+    if HEAD_file then
+        local head = HEAD_file:read()
+        HEAD_file:close()
+        local branch = head:match("ref: refs/heads/(.+)$")
+        if branch then
+            return branch
+        else
+            return "uhhhhhhh"
+        end
+    end
 end
 
 -- TODO: Make it update not when buffer changes
@@ -137,11 +169,11 @@ function M.render()
         " ",
         pos,
         " ",
-        time
+        time,
     }
 end
 
--- Setup for bar to be on top
+-- Setup for bar
 vim.api.nvim_create_autocmd("BufWinEnter", {
     group = vim.api.nvim_create_augroup("the/topbar", { clear = true }),
     desc = "topbar",
