@@ -1,5 +1,7 @@
+![A Neovim statusbar on the top of the screen](.github/assets/screenshots.jpg)
+
 # topbar.nvim
-A extraordinary Statusbar for Neovim!
+An extraordinary Statusbar for Neovim!
 > [!WARNING]
 > This plugin is unfinished.
 >
