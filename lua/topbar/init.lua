@@ -3,100 +3,64 @@
 
 -- local render = require("topbar.render")
 
+local conf = require("topbar.config")
+
 local M = {}
 
-M.config = {
-
-    mode = {
-        labels = {
-            normal = "NORMAL",
-            insert = "INSERT",
-            visual = "VISUAL",
-            select = "SELECT",
-            terminal = "TERMINAL",
-            command = "COMMAND",
-            op_pending = "OP-PENDING",
-            replace = "REPLACE",
-            vir_replace = "VIR-REPLACE",
-            more = "MORE",
-            confirm = "CONFIRM",
-            ex = "EX",
-            shell = "SHELL",
-            prompt = "PROMPT",
-        },
-
-        padding = 1  -- Adds padding left and right of the mode
-    },
-
-    time = {
-        format = "%H:%M"
-    },
-
-    file_name = {
-        labels = {
-            modified = "+",
-            read_only = "-",
-            unnamed = "No Name",
-            new = "New",
-        },
-    }
-
-}
-
 M.setup = function(args)
-    M.config = vim.tbl_deep_extend("keep", M.config, args or {})
+    -- M.config = vim.tbl_deep_extend("keep", M.config, args or {})
+    conf = vim.tbl_deep_extend("keep", conf, args or {})
 end
 
 function M.component_mode()
     local mode_to_str = {
-        ['n'] = M.config.mode.labels.normal,
-        ['no'] = M.config.mode.labels.op_pending,
-        ['nov'] = M.config.mode.labels.op_pending,
-        ['noV'] = M.config.mode.labels.op_pending,
-        ['no\22'] = M.config.mode.labels.op_pending,
-        ['niI'] = M.config.mode.labels.normal,
-        ['niR'] = M.config.mode.labels.normal,
-        ['niV'] = M.config.mode.labels.normal,
-        ['nt'] = M.config.mode.labels.normal,
-        ['ntT'] = M.config.mode.labels.normal,
-        ['v'] = M.config.mode.labels.visual,
-        ['vs'] = M.config.mode.labels.visual,
-        ['V'] = M.config.mode.labels.visual,
-        ['Vs'] = M.config.mode.labels.visual,
-        ['\22'] = M.config.mode.labels.visual,
-        ['\22s'] = M.config.mode.labels.visual,
-        ['s'] = M.config.mode.labels.select,
-        ['S'] = M.config.mode.labels.select,
-        ['\19'] = M.config.mode.labels.select,
-        ['i'] = M.config.mode.labels.insert,
-        ['ic'] = M.config.mode.labels.insert,
-        ['ix'] = M.config.mode.labels.insert,
-        ['R'] = M.config.mode.labels.replace,
-        ['Rc'] = M.config.mode.labels.replace,
-        ['Rx'] = M.config.mode.labels.replace,
-        ['Rv'] = M.config.mode.labels.vir_replace,
-        ['Rvc'] = M.config.mode.labels.vir_replace,
-        ['Rvx'] = M.config.mode.labels.vir_replace,
-        ['c'] = M.config.mode.labels.command,
-        ['cv'] = M.config.mode.labels.ex,
-        ['ce'] = M.config.mode.labels.ex,
-        ['r'] = M.config.mode.labels.prompt,
-        ['rm'] = M.config.mode.labels.more,
-        ['r?'] = M.config.mode.labels.confirm,
-        ['!'] = M.config.mode.labels.shell,
-        ['t'] = M.config.mode.labels.terminal,
+        ['n'] = conf.mode.labels.normal,
+        ['no'] = conf.mode.labels.op_pending,
+        ['nov'] = conf.mode.labels.op_pending,
+        ['noV'] = conf.mode.labels.op_pending,
+        ['no\22'] = conf.mode.labels.op_pending,
+        ['niI'] = conf.mode.labels.normal,
+        ['niR'] = conf.mode.labels.normal,
+        ['niV'] = conf.mode.labels.normal,
+        ['nt'] = conf.mode.labels.normal,
+        ['ntT'] = conf.mode.labels.normal,
+        ['v'] = conf.mode.labels.visual,
+        ['vs'] = conf.mode.labels.visual,
+        ['V'] = conf.mode.labels.visual,
+        ['Vs'] = conf.mode.labels.visual,
+        ['\22'] = conf.mode.labels.visual,
+        ['\22s'] = conf.mode.labels.visual,
+        ['s'] = conf.mode.labels.select,
+        ['S'] = conf.mode.labels.select,
+        ['\19'] = conf.mode.labels.select,
+        ['i'] = conf.mode.labels.insert,
+        ['ic'] = conf.mode.labels.insert,
+        ['ix'] = conf.mode.labels.insert,
+        ['R'] = conf.mode.labels.replace,
+        ['Rc'] = conf.mode.labels.replace,
+        ['Rx'] = conf.mode.labels.replace,
+        ['Rv'] = conf.mode.labels.vir_replace,
+        ['Rvc'] = conf.mode.labels.vir_replace,
+        ['Rvx'] = conf.mode.labels.vir_replace,
+        ['c'] = conf.mode.labels.command,
+        ['cv'] = conf.mode.labels.ex,
+        ['ce'] = conf.mode.labels.ex,
+        ['r'] = conf.mode.labels.prompt,
+        ['rm'] = conf.mode.labels.more,
+        ['r?'] = conf.mode.labels.confirm,
+        ['!'] = conf.mode.labels.shell,
+        ['t'] = conf.mode.labels.terminal,
     }
 
     local mode = mode_to_str[vim.api.nvim_get_mode().mode] or ""
-    -- return mode
 
     local highlight = ""
 
-    if mode:find(M.config.mode.labels.normal) or mode:find(M.config.mode.labels.op_pending) then
+    if mode:find(conf.mode.labels.normal) or mode:find(conf.mode.labels.op_pending) then
         highlight = "%#StatusNormal#"
-    elseif mode:find(M.config.mode.labels.visual) then
+    elseif mode:find(conf.mode.labels.visual) then
         highlight = "%#StatusVisual#"
-    elseif mode:find(M.config.mode.labels.insert) or mode:find(M.config.mode.labels.select) then
+    elseif mode:find(conf.mode.labels.insert) or mode:find(conf.mode.labels.select) then
         highlight = "%#StatusInsert#"
     else
         highlight = "%#StatusNormal#"
@@ -104,11 +68,12 @@ function M.component_mode()
 
     return table.concat {
         string.format("%s", highlight),
-        string.format("%s", string.rep(" ", M.config.mode.padding)),
+        string.format("%s", string.rep(" ", conf.mode.padding)),
         string.format("%s", mode),
-        string.format("%s", string.rep(" ", M.config.mode.padding)),
+        string.format("%s", string.rep(" ", conf.mode.padding)),
         string.format("%s", "%#StatusLine#"),
     }
+
 end
 
 function M.component_position()
@@ -116,17 +81,33 @@ function M.component_position()
     local column = vim.fn.charcol(".")
 
     return string.format("%d:%d", line, column)
+
+end
+
+function M.component_progress()
+    local current_line = vim.fn.line(".")
+    local bottom = vim.fn.line("$")
+
+    if current_line == 1 then
+        return "Top"
+    elseif current_line == bottom then
+        return "Bottom"
+    else
+        return string.format("%2d%%%%", math.floor(current_line / bottom * 100))
+    end
+
 end
 
 -- TODO: make it only show filenamw instead of path
 function M.component_filename()
     if vim.bo.modified then
-        return "%f " .. string.format("[%s]", M.config.file_name.labels.modified)
+        return "%f " .. string.format("[%s]", conf.file_name.labels.modified)
     elseif vim.bo.modifiable == false or vim.bo.readonly then
-        return "%f " .. string.format("[%s]", M.config.file_name.labels.read_only)
+        return "%f " .. string.format("[%s]", conf.file_name.labels.read_only)
     else
         return "%f"
     end
+
 end
 
 -- TODO: proper implementation
@@ -142,18 +123,25 @@ function M.component_git()
             return "uhhhhhhh"
         end
     end
+
 end
 
 -- TODO: Make it update not when buffer changes
 function M.component_time()
-    return os.date(M.config.time.format)
+    return os.date(conf.time.format)
 end
 
 function M.component_search_count()
     
 end
 
+-- TODO: Proper implementation
+function M.component_recent_keybind()
+    return vim.keycode
+end
+
 -- Displaying contents of topbar
+-- Add configuration similar to lualine
 function M.render()
     local mode = M.component_mode()
     local filename = M.component_filename()
@@ -170,6 +158,8 @@ function M.render()
         pos,
         " ",
         time,
+        " ",
+        M.component_progress()
     }
 end
 
